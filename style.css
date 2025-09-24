@@ -1,0 +1,559 @@
+/* --- Global Imports --- */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+/*
+========================================
+Estilos de la App Principal (index.html)
+========================================
+*/
+
+body.page-app {
+    font-family: 'Poppins', sans-serif;    
+    background: #141E30;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: #e0e0e0;
+    margin: 0;
+    padding: 20px;
+    line-height: 1.6;
+    opacity: 0; /* Inicia invisible para la animación de entrada */
+    animation: pageFadeIn 0.5s ease-in forwards;
+}
+
+.page-app header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.page-app header h1 {
+    color: #ffffff;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.page-app main {
+    max-width: 800px;
+    margin: 0 auto;
+    display: grid;
+    gap: 40px;
+}
+
+.page-app .goal-form-container, .page-app .goals-list-container, .page-app .strategies-container, .page-app .theory-container {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+}
+
+.page-app h2 {
+    margin-top: 0;
+    color: #00f2ff;
+    border-bottom: 2px solid rgba(0, 242, 255, 0.2);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.page-app .form-group {
+    margin-bottom: 15px;
+}
+
+.page-app .form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+}
+
+.page-app .form-group input, .page-app .form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #e0e0e0;
+    font-family: 'Poppins', sans-serif;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.page-app .form-group select option {
+    background: #1e2a38; /* Un fondo oscuro del tema */
+    color: #e0e0e0;
+}
+
+.page-app .form-group input:focus, .page-app .form-group select:focus {
+    outline: none;
+    border-color: #00f2ff;
+    box-shadow: 0 0 10px rgba(0, 242, 255, 0.5);
+}
+
+.page-app button {
+    display: block;
+    width: 100%;
+    padding: 12px;
+    background: #00f2ff;
+    background: -webkit-linear-gradient(to right, #00D4FF, #00F2FF);
+    background: linear-gradient(to right, #00D4FF, #00F2FF);
+    color: #141E30;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 700;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-app button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4);
+}
+
+/* --- Estilos de las Tarjetas de Meta --- */
+.page-app #goals-list {
+    display: grid;
+    gap: 20px;
+}
+
+.goal-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: relative;
+    overflow: hidden; /* Para que la imagen no se salga de los bordes redondeados */
+    display: flex;
+    flex-direction: column;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.goal-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+}
+
+.goal-card-header {
+    height: 150px;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 15px;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.7);
+    position: relative;
+}
+
+.goal-card-header::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+}
+
+.goal-card h3 {
+    margin-top: 0;
+    margin-bottom: 0;
+    position: relative; /* Para que esté por encima del degradado */
+    z-index: 1;
+}
+
+.goal-info {
+    font-size: 0.9rem;
+    color: #bdc3c7;
+    margin-bottom: 15px;
+}
+
+.goal-info span {
+    font-weight: 600;
+    color: #ecf0f1;
+}
+
+.goal-card-body {
+    padding: 20px;
+}
+
+.progress-bar-container {
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 10px;
+    margin-bottom: 15px;
+    height: 20px;
+    overflow: hidden;
+}
+
+.progress-bar {
+    height: 100%;
+    width: 0%; /* Se actualizará con JS */
+    background: linear-gradient(90deg, #00f2ff, #3854e9);
+    border-radius: 10px;
+    transition: width 0.5s ease-in-out, background 0.5s ease;
+    text-align: center;
+    color: white;
+    font-size: 0.8rem;
+    line-height: 20px;
+}
+
+.add-saving-form {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.add-saving-form input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+    color: #e0e0e0;
+}
+
+.add-saving-form button {
+    width: auto;
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: 700;
+    background: #00bf72;
+    color: #fff;
+}
+
+.add-saving-form button:hover {
+    background: #00a764;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 191, 114, 0.4);
+}
+
+.delete-goal-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(0, 0, 0, 0.4);
+    border: none;
+    color: #ff4d4d;
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+    line-height: 1;
+    width: auto;
+    z-index: 2; /* Para que esté sobre la imagen */
+    border-radius: 50%;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.delete-goal-btn:hover {
+    color: white;
+    background-color: #ff4d4d;
+}
+
+/* --- Estilos de las Estrategias de Ahorro --- */
+.strategies-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+.strategy-card {
+    background: rgba(0, 242, 255, 0.05);
+    border: 1px solid rgba(0, 242, 255, 0.2);
+    padding: 20px;
+    border-radius: 8px;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.strategy-card:hover {
+    background: rgba(0, 242, 255, 0.1);
+    transform: translateY(-5px);
+}
+
+.strategy-card h3 {
+    margin-top: 0;
+    color: #00f2ff;
+    font-size: 1.1rem;
+}
+
+.strategy-card p {
+    margin-bottom: 0;
+    font-size: 0.9rem;
+    color: #bdc3c7;
+}
+
+/* --- Estilos de la sección de Teoría --- */
+.theory-container p {
+    color: #bdc3c7;
+}
+
+.theory-container ul {
+    list-style: none;
+    padding-left: 0;
+    margin-top: 20px;
+}
+
+.theory-container li {
+    background: rgba(0, 242, 255, 0.05);
+    border-left: 3px solid #00f2ff;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 0 4px 4px 0;
+}
+
+.theory-container li strong {
+    color: #00f2ff;
+}
+
+/*
+========================================
+Estilos de la Página de Bienvenida (landing.html)
+========================================
+*/
+
+body.page-landing, .page-landing html {
+    height: 100%;
+    margin: 0;
+    font-family: 'Poppins', sans-serif;    
+    background: #141E30;  /* fallback for old browsers */
+    background: -webkit-linear-gradient(to right, #243B55, #141E30);  /* Chrome 10-25, Safari 5.1-6 */
+    background: linear-gradient(to right, #243B55, #141E30); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    color: #e0e0e0;
+    overflow: hidden; /* Evita scrollbars durante la animación */
+}
+
+.page-landing .splash-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    height: 100%;
+    padding: 20px;
+}
+
+.page-landing .splash-container h1 {
+    font-size: 4rem;
+    margin-bottom: 0.5rem;
+    font-weight: 700;    
+    color: #ffffff;
+    text-shadow: 0 0 10px rgba(0, 255, 255, 0.7), 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.page-landing .splash-container p {
+    font-size: 1.2rem;
+    font-weight: 300;
+    margin-bottom: 2.5rem;
+    color: #bdc3c7;
+}
+
+.page-landing .cta-button {
+    padding: 15px 35px;
+    background: #00f2ff;
+    background: -webkit-linear-gradient(to right, #00D4FF, #00F2FF);
+    background: linear-gradient(to right, #00D4FF, #00F2FF);
+    color: #141E30;
+    border-radius: 4px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 1.1rem;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.page-landing .cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 242, 255, 0.4);
+}
+
+/* --- Animaciones --- */
+.page-landing .fade-in { animation: fadeIn 1s ease-in-out forwards; }
+.page-landing .fade-in-delay { animation: fadeIn 1s ease-in-out 0.5s forwards; opacity: 0; }
+.page-landing .slide-up { animation: slideUp 0.8s ease-out 1s forwards; opacity: 0; }
+
+@keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+/* --- Estilos del Carrusel de Imágenes --- */
+.page-landing .image-carousel {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    overflow: hidden;
+    padding: 1rem 0;
+    background: rgba(0, 0, 0, 0.1);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    mask-image: linear-gradient(to right, transparent, black 20%, black 80%, transparent);
+    pointer-events: none; /* Para que no interfiera con el contenido principal */
+}
+
+.page-landing .carousel-track {
+    display: flex;
+    width: calc(320px * 8); /* Ancho de imagen (300px + 20px de margen) * número de imágenes */
+    animation: scroll 40s linear infinite;
+}
+
+.page-landing .carousel-track img {
+    width: 300px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 12px;
+    margin: 0 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
+
+@keyframes scroll {
+    from {
+        transform: translateX(0);
+    }
+    to {
+        transform: translateX(calc(-320px * 4)); /* Mueve la mitad del track */
+    }
+}
+
+/*
+========================================
+Estilos de Transición de Página
+========================================
+*/
+
+body.fade-out {
+    opacity: 0;
+    transition: opacity 0.5s ease-out;
+}
+
+@keyframes pageFadeIn {
+    from { opacity: 0; } to { opacity: 1; }
+}
+
+/*
+========================================
+Estilos del Diario Emocional y Modal
+========================================
+*/
+
+.journal-container #journal-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.journal-entry {
+    background: rgba(255, 255, 255, 0.05);
+    border-left: 3px solid #a8eb12;
+    padding: 15px;
+    border-radius: 0 4px 4px 0;
+}
+
+.journal-entry .date {
+    font-size: 0.8rem;
+    color: #7f8c8d;
+    margin-bottom: 5px;
+}
+
+.journal-entry .emotion {
+    font-weight: 600;
+    font-size: 1.1rem;
+    color: #ecf0f1;
+}
+
+.journal-entry .comment {
+    font-size: 0.9rem;
+    color: #bdc3c7;
+    margin-top: 8px;
+    font-style: italic;
+}
+
+/* Estilos del Modal */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: #1e2a38;
+    padding: 30px;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 400px;
+    text-align: center;
+    border: 1px solid rgba(0, 242, 255, 0.2);
+}
+
+.emotion-choices {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin: 20px 0;
+}
+
+.emotion-choices button {
+    font-size: 1.5rem;
+    padding: 10px 20px;
+    background-color: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: white;
+}
+
+.modal-content textarea {
+    width: 100%;
+    height: 80px;
+    margin-bottom: 20px;
+    background-color: rgba(0,0,0,0.2);
+    color: #e0e0e0;
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 4px;
+    padding: 10px;
+    font-family: 'Poppins', sans-serif;
+}
+
+/*
+========================================
+Responsive Design
+========================================
+*/
+
+@media (max-width: 768px) {
+    /* --- Estilos Generales de la App --- */
+    body.page-app {
+        padding: 15px;
+    }
+
+    .page-app main {
+        gap: 30px;
+    }
+
+    .page-app h2 {
+        font-size: 1.4rem;
+    }
+
+    .page-app .goal-form-container, .page-app .goals-list-container, .page-app .strategies-container, .page-app .theory-container, .page-app .journal-container {
+        padding: 20px;
+    }
+
+    /* --- Estilos de la Landing Page --- */
+    .page-landing .splash-container h1 {
+        font-size: 2.8rem;
+    }
+
+    .page-landing .splash-container p {
+        font-size: 1.1rem;
+    }
+
+    /* --- Estilos del Modal --- */
+    .emotion-choices {
+        gap: 10px;
+    }
+    .emotion-choices button {
+        font-size: 1.2rem;
+        padding: 8px 15px;
+    }
+}
