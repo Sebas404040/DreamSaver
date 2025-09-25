@@ -1,107 +1,72 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DreamSaver - Ahorra para tus sueños</title>
+    <title>Bienvenido a DreamSaver</title>
     <link rel="stylesheet" href="style.css">
 </head>
-<body class="page-app">
-    <header>
-        <h1>DreamSaver</h1>
-        <p>Define tus metas y ahorra para alcanzar tus sueños.</p>
+<body class="page-landing">
+    <!-- 1. Sección Principal (Hero) -->
+    <header class="hero-section">
+        <div class="hero-content">
+            <h1 class="fade-in">DreamSaver</h1>
+            <p class="fade-in-delay">Tu asistente personal para alcanzar metas financieras. <br>Define tus sueños, traza un plan y observa cómo se hacen realidad.</p>
+            <a href="app.html" class="cta-button slide-up">Empieza a Ahorrar Ahora</a>
+        </div>
     </header>
 
     <main>
-        <section class="goal-form-container">
-            <h2>Crea una nueva meta de ahorro</h2>
-            <form id="goal-form">
-                <div class="form-group">
-                    <label for="goal-name">Nombre de la meta:</label>
-                    <input type="text" id="goal-name" placeholder="Ej: Nuevo portátil" required>
+        <!-- 2. Sección de Características -->
+        <section class="features-section">
+            <h2>¿Por qué DreamSaver?</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">🎯</div>
+                    <h3>Metas Claras y Visuales</h3>
+                    <p>Crea metas personalizadas con imágenes y montos específicos. Ver tu objetivo lo hace más alcanzable.</p>
                 </div>
-                <div class="form-group">
-                    <label for="goal-target">Monto objetivo ($):</label>
-                    <input type="number" id="goal-target" placeholder="Ej: 1500" required min="1">
+                <div class="feature-card">
+                    <div class="feature-icon">📊</div>
+                    <h3>Progreso en Tiempo Real</h3>
+                    <p>Observa cómo tus ahorros crecen con barras de progreso dinámicas que te mantienen motivado.</p>
                 </div>
-                <div class="form-group">
-                    <label for="goal-image">URL de la imagen (opcional):</label>
-                    <input type="url" id="goal-image" placeholder="https://ejemplo.com/imagen.jpg">
-                </div>
-                <div class="form-group">
-                    <label for="goal-timeframe">Plazo para lograrlo:</label>
-                    <select id="goal-timeframe" required>
-                        <option value="14">2 Semanas</option>
-                        <option value="30">1 Mes</option>
-                        <option value="90">3 Meses</option>
-                        <option value="180">6 Meses</option>
-                        <option value="365">1 Año</option>
-                        <option value="730">2 Años</option>
-                    </select>
-                </div>
-                <button type="submit">Añadir Meta</button>
-            </form>
-        </section>
-
-        <section class="goals-list-container">
-            <h2>Mis Metas</h2>
-            <div id="goals-list"></div>
-        </section>
-
-        <section class="strategies-container">
-            <h2>Estrategias de Ahorro</h2>
-            <div class="strategies-grid">
-                <div class="strategy-card">
-                    <h3>La Regla 50/30/20</h3>
-                    <p>Divide tus ingresos: 50% para necesidades, 30% para deseos y un 20% directo a tus ahorros y metas.</p>
-                </div>
-                <div class="strategy-card">
-                    <h3>Automatiza tu Ahorro</h3>
-                    <p>Configura transferencias automáticas a tu cuenta de ahorros justo después de recibir tu sueldo. ¡Ahorra sin pensar!</p>
-                </div>
-                <div class="strategy-card">
-                    <h3>Días sin Gastos</h3>
-                    <p>Elige uno o dos días a la semana en los que te comprometes a no realizar ningún gasto superfluo.</p>
+                <div class="feature-card">
+                    <div class="feature-icon">💖</div>
+                    <h3>Conecta con tus Emociones</h3>
+                    <p>Usa el diario emocional para reflexionar sobre tu viaje financiero y entender cómo te sientes al respecto.</p>
                 </div>
             </div>
         </section>
 
-        <section class="theory-container">
-            <h2>Beneficios del Ahorro</h2>
-            <p>Ahorrar dinero es más que solo guardar una parte de tus ingresos; es una herramienta poderosa para construir tu futuro y alcanzar la libertad financiera. Aquí te mostramos algunos beneficios clave:</p>
-            <ul>
-                <li><strong>Seguridad Financiera:</strong> Un fondo de emergencia te protege de imprevistos como gastos médicos o la pérdida de empleo, dándote tranquilidad.</li>
-                <li><strong>Cumplimiento de Metas:</strong> El ahorro te permite alcanzar grandes objetivos, como comprar una casa, viajar por el mundo o pagar tu educación, sin necesidad de endeudarte.</li>
-                <li><strong>Independencia y Libertad:</strong> Acumular ahorros te da la libertad de tomar decisiones importantes en tu vida, como cambiar de carrera o retirarte temprano.</li>
-                <li><strong>Reducción de Estrés:</strong> Saber que tienes un colchón financiero reduce la ansiedad relacionada con el dinero y mejora tu bienestar general.</li>
-            </ul>
-        </section>
-
-        <section class="journal-container">
-            <h2>Mi Diario Emocional</h2>
-            <div id="journal-list">
-                <!-- Las entradas del diario se cargarán aquí -->
+        <!-- 3. Sección "Cómo Funciona" -->
+        <section class="how-it-works-section">
+            <h2>Empezar es muy fácil</h2>
+            <div class="steps-container">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <h3>Crea tu Meta</h3>
+                    <p>Define qué quieres lograr, cuánto cuesta y para cuándo lo quieres.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <h3>Registra tu Progreso</h3>
+                    <p>Añade los ahorros que vas consiguiendo y mira cómo te acercas a tu sueño.</p>
+                </div>
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <h3>¡Celebra tu Logro!</h3>
+                    <p>Alcanza el 100% y disfruta de la satisfacción de haberlo conseguido.</p>
+                </div>
             </div>
         </section>
     </main>
 
-    <!-- Modal para el Check-in Emocional -->
-    <div id="emotion-modal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <h2>Check-in Semanal</h2>
-            <p>¡Ha pasado otra semana! ¿Cómo te sientes acerca de tu progreso de ahorro?</p>
-            <div id="emotion-choices" class="emotion-choices">
-                <button data-emotion="Feliz">😊 Feliz</button>
-                <button data-emotion="Neutral">🙂 Neutral</button>
-                <button data-emotion="Preocupado">😟 Preocupado</button>
-            </div>
-            <textarea id="emotion-comment" placeholder="Añade un comentario (opcional)..."></textarea>
-            <button id="save-emotion-btn">Guardar Sentimiento</button>
-        </div>
-    </div>
+    <!-- 4. Pie de Página -->
+    <footer class="landing-footer">
+        <p>&copy; 2024 DreamSaver. Ayudándote a construir tus sueños.</p>
+    </footer>
 
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.2/dist/confetti.browser.min.js"></script>
-    <script src="app.js"></script>
+    <script src="landing.js"></script>
 </body>
 </html>

@@ -1,17 +1,46 @@
 document.addEventListener('DOMContentLoaded', () => {
     const goalForm = document.getElementById('goal-form');
     const goalsList = document.getElementById('goals-list');
-    const journalList = document.getElementById('journal-list');
+    const latestJournalEntryContainer = document.getElementById('latest-journal-entry');
     const emotionModal = document.getElementById('emotion-modal');
+    const sidebar = document.querySelector('.sidebar-content');
     const emotionChoices = document.getElementById('emotion-choices');
     const saveEmotionBtn = document.getElementById('save-emotion-btn');
+    const deleteConfirmModal = document.getElementById('delete-confirm-modal');
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    const cancelDeleteBtn = document.getElementById('cancel-delete-btn');
 
     // La animación de entrada se maneja principalmente con CSS
 
     let selectedEmotion = null;
+    let emotionChart = null; // Variable para mantener la instancia del gráfico
+    let goalCharts = {}; // Objeto para mantener las instancias de los gráficos de metas
 
+    let goalToDelete = null; // Variable para guardar el ID de la meta a eliminar
     // Cargar metas desde localStorage o inicializar un array vacío
     let goals = JSON.parse(localStorage.getItem('goals')) || [];
+
+    // --- LÓGICA DE NOTIFICACIONES TOAST ---
+    const showToast = (message, type = 'error') => {
+        const toastContainer = document.getElementById('toast-container');
+        
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        toast.textContent = message;
+
+        toastContainer.appendChild(toast);
+
+        // Forzar animación de entrada
+        setTimeout(() => {
+            toast.classList.add('show');
+        }, 10);
+
+        // Ocultar y eliminar el toast después de 3 segundos
+        setTimeout(() => {
+            toast.classList.remove('show');
+            toast.addEventListener('transitionend', () => toast.remove());
+        }, 3000);
+    };
 
     // Función para guardar las metas en localStorage
     const saveGoals = () => {
@@ -21,6 +50,10 @@ document.addEventListener('DOMContentLoaded', () => {
     // Función para renderizar (mostrar) las metas en la página
     const renderGoals = () => {
         goalsList.innerHTML = ''; // Limpiar la lista actual
+        
+        // Destruir gráficos antiguos para evitar fugas de memoria
+        Object.values(goalCharts).forEach(chart => chart.destroy());
+        goalCharts = {};
 
         if (goals.length === 0) {
             goalsList.innerHTML = '<p>Aún no tienes metas. ¡Crea una para empezar a ahorrar!</p>';
@@ -29,23 +62,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         goals.forEach(goal => {
             const progress = (goal.saved / goal.target) * 100;
+            const remaining = goal.target - goal.saved;
             const dailyTarget = goal.target / goal.timeframe;
 
             // Imagen por defecto si el usuario no proporciona una
             const imageUrl = goal.image || 'https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?q=80&w=800&h=300&fit=crop';
 
             const goalCard = document.createElement('div');
-            goalCard.className = 'goal-card';
+            goalCard.className = `goal-card ${goal.completed ? 'completed' : ''}`;
             goalCard.dataset.id = goal.id;
-
-            // Lógica para el color dinámico de la barra de progreso
-            let progressBarGradient = 'linear-gradient(90deg, #00f2ff, #3854e9)'; // Azul/Cyan (inicio)
-            if (progress > 50) {
-                progressBarGradient = 'linear-gradient(90deg, #00bf72, #a8eb12)'; // Verde (a mitad)
-            }
-            if (goal.completed || progress >= 100) {
-                progressBarGradient = 'linear-gradient(90deg, #ffc300, #ff5733)'; // Dorado/Naranja (completado)
-            }
 
             goalCard.innerHTML = `
                 <button class="delete-goal-btn" title="Eliminar meta">&times;</button>
@@ -53,14 +78,21 @@ document.addEventListener('DOMContentLoaded', () => {
                     <h3>${goal.name}</h3>
                 </div>
                 <div class="goal-card-body">
-                    <div class="goal-info">
-                        Ahorrado: <span>$${goal.saved.toFixed(2)}</span> de <span>$${goal.target.toFixed(2)}</span>
-                    </div>
-                    <div class="progress-bar-container">
-                        <div class="progress-bar" style="width: ${progress.toFixed(2)}%; background: ${progressBarGradient};">${progress.toFixed(2)}%</div>
-                    </div>
-                    <div class="goal-info">
-                        Ahorro diario sugerido: <span>$${dailyTarget.toFixed(2)}</span>
+                    <div class="goal-dashboard">
+                        <div class="goal-chart-container">
+                            <canvas id="chart-${goal.id}"></canvas>
+                            <div class="chart-percentage">${progress.toFixed(1)}%</div>
+                        </div>
+                        <div class="goal-stats">
+                            <div class="stat-item">
+                                <label>Ahorrado</label>
+                                <span class="stat-value">$${goal.saved.toFixed(2)}</span>
+                            </div>
+                            <div class="stat-item">
+                                <label>Faltante</label>
+                                <span class="stat-value">$${remaining.toFixed(2)}</span>
+                            </div>
+                        </div>
                     </div>
                     ${!goal.completed ? `
                         <form class="add-saving-form">
@@ -71,18 +103,59 @@ document.addEventListener('DOMContentLoaded', () => {
                 </div>
             `;
             goalsList.appendChild(goalCard);
+
+            // --- Crear el Gráfico de Anillo ---
+            const ctx = document.getElementById(`chart-${goal.id}`).getContext('2d');
+            if (ctx) {
+                const chartData = {
+                    datasets: [{
+                        data: [goal.saved, Math.max(0, remaining)],
+                        backgroundColor: [
+                            goal.completed ? '#ffc300' : '#00f2ff', // Color del progreso
+                            'rgba(255, 255, 255, 0.1)' // Color de lo que falta
+                        ],
+                        borderWidth: 0,
+                        hoverBackgroundColor: [
+                            goal.completed ? '#ffc300' : '#00f2ff',
+                            'rgba(255, 255, 255, 0.1)'
+                        ]
+                    }]
+                };
+
+                goalCharts[goal.id] = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: chartData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        cutout: '80%', // Grosor del anillo
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                enabled: false
+                            }
+                        },
+                        animation: {
+                            animateScale: true,
+                            animateRotate: true
+                        }
+                    }
+                });
+            }
         });
     };
 
-    // Manejar el envío del formulario para crear una nueva meta
-    goalForm.addEventListener('submit', (e) => {
-        e.preventDefault();
+    // --- LÓGICA DEL ASISTENTE DE CREACIÓN DE METAS ---
+    let currentStep = 1;
+    const totalSteps = 3;
 
+    const getFormValues = () => {
         const name = document.getElementById('goal-name').value;
         const target = parseFloat(document.getElementById('goal-target').value);
         const timeframe = parseInt(document.getElementById('goal-timeframe').value, 10);
         const image = document.getElementById('goal-image').value;
-
         const newGoal = {
             id: Date.now(), // ID único basado en la fecha actual
             name,
@@ -93,12 +166,66 @@ document.addEventListener('DOMContentLoaded', () => {
             saved: 0,
             createdAt: new Date()
         };
+        return newGoal;
+    };
 
+    const updateFormStep = () => {
+        document.querySelectorAll('.form-step').forEach(step => {
+            step.classList.toggle('active', parseInt(step.dataset.step) === currentStep);
+        });
+        document.querySelectorAll('.progress-bar-step').forEach(step => {
+            const stepNum = parseInt(step.dataset.step);
+            step.classList.toggle('active', stepNum === currentStep);
+            step.classList.toggle('completed', stepNum < currentStep);
+        });
+    };
+
+    goalForm.addEventListener('click', (e) => {
+        if (e.target.matches('.next-step-btn')) {
+            // Validación simple antes de pasar al siguiente paso
+            const currentStepElement = goalForm.querySelector(`.form-step[data-step="${currentStep}"]`);
+            const inputs = currentStepElement.querySelectorAll('input[required], select[required]');
+            let isValid = true;
+            inputs.forEach(input => {
+                if (!input.value) {
+                    isValid = false;
+                    input.focus();
+                    showToast('Por favor, completa este campo.', 'warning');
+                }
+            });
+
+            if (isValid && currentStep < totalSteps) {
+                currentStep++;
+                updateFormStep();
+            }
+        } else if (e.target.matches('.prev-step-btn')) {
+            if (currentStep > 1) {
+                currentStep--;
+                updateFormStep();
+            }
+        }
+    });
+
+    // Manejar el envío del formulario para crear una nueva meta
+    goalForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        // Validación final
+        const timeframeSelect = document.getElementById('goal-timeframe');
+        if (!timeframeSelect.value) {
+            showToast('Por favor, selecciona un plazo.', 'warning');
+            return;
+        }
+
+        const newGoal = getFormValues();
         goals.push(newGoal);
         saveGoals();
         renderGoals();
 
         goalForm.reset();
+        currentStep = 1;
+        updateFormStep();
+        showToast('¡Nueva meta creada con éxito!', 'info');
     });
 
     // Manejar acciones dentro de las tarjetas de meta (añadir ahorro, eliminar)
@@ -111,11 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // Si se hace clic en el botón de eliminar
         if (target.classList.contains('delete-goal-btn')) {
-            if (confirm('¿Estás seguro de que quieres eliminar esta meta?')) {
-                goals = goals.filter(goal => goal.id !== goalId);
-                saveGoals();
-                renderGoals();
-            }
+            goalToDelete = goalId;
+            deleteConfirmModal.style.display = 'flex';
         }
     });
 
@@ -135,19 +259,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (goal) {
                 // Verificación 0: No añadir a metas completadas.
                 if (goal.completed) {
-                    alert('¡Felicidades! Ya has completado esta meta.');
+                    showToast('¡Felicidades! Ya has completado esta meta.', 'info');
                     return;
                 }
 
                 // Verificación 1: No permitir números negativos o cero.
                 if (amount <= 0) {
-                    alert('Por favor, introduce una cantidad positiva.');
+                    showToast('Por favor, introduce una cantidad positiva.');
                     return;
                 }
 
                 // Verificación 2: No permitir que el ahorro total supere la meta.
                 if (goal.saved + amount > goal.target) {
-                    alert(`No puedes añadir esa cantidad. Te pasarías de tu meta por $${((goal.saved + amount) - goal.target).toFixed(2)}.`);
+                    const overage = ((goal.saved + amount) - goal.target).toFixed(2);
+                    showToast(`No puedes añadir esa cantidad. Te pasarías por $${overage}.`);
                     return;
                 }
 
@@ -171,6 +296,37 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // --- LÓGICA DEL ACORDEÓN DE ESTRATEGIAS ---
+    if (sidebar) {
+        sidebar.addEventListener('click', (e) => {
+            const header = e.target.closest('.accordion-header');
+            if (header) {
+                const item = header.parentElement;
+                const content = item.querySelector('.accordion-content');
+                item.classList.toggle('active');
+                content.style.maxHeight = item.classList.contains('active') ? `${content.scrollHeight}px` : null;
+            }
+        });
+    }
+
+
+    // --- LÓGICA DEL MODAL DE CONFIRMACIÓN DE ELIMINACIÓN ---
+    confirmDeleteBtn.addEventListener('click', () => {
+        if (goalToDelete !== null) {
+            goals = goals.filter(goal => goal.id !== goalToDelete);
+            saveGoals();
+            renderGoals();
+            deleteConfirmModal.style.display = 'none';
+            goalToDelete = null;
+            showToast('Meta eliminada.', 'info');
+        }
+    });
+
+    cancelDeleteBtn.addEventListener('click', () => {
+        deleteConfirmModal.style.display = 'none';
+        goalToDelete = null;
+    });
+
     // --- LÓGICA DEL DIARIO EMOCIONAL ---
 
     // Cargar entradas del diario
@@ -182,25 +338,89 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     // Renderizar entradas del diario
-    const renderJournal = () => {
-        journalList.innerHTML = '';
+    const renderJournal = () => {        
         if (journalEntries.length === 0) {
-            journalList.innerHTML = '<p>Aún no hay registros. Tu diario emocional aparecerá aquí.</p>';
+            latestJournalEntryContainer.innerHTML = '<p>Aún no hay registros. Tu diario emocional aparecerá aquí.</p>';
             return;
         }
 
-        // Mostrar en orden cronológico inverso (el más nuevo primero)
-        [...journalEntries].reverse().forEach(entry => {
-            const entryCard = document.createElement('div');
-            entryCard.className = 'journal-entry';
-            const entryDate = new Date(entry.date).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
+        // Mostrar la última entrada
+        const latestEntry = journalEntries[journalEntries.length - 1];
+        const latestEntryDate = new Date(latestEntry.date).toLocaleDateString('es-ES', { day: '2-digit', month: 'short', year: 'numeric' });
+        const emotionIcons = { 'Feliz': '😊', 'Neutral': '🙂', 'Preocupado': '😟' };
 
-            entryCard.innerHTML = `
-                <div class="date">${entryDate}</div>
-                <div class="emotion">${entry.emotion}</div>
-                ${entry.comment ? `<p class="comment">"${entry.comment}"</p>` : ''}
-            `;
-            journalList.appendChild(entryCard);
+        latestJournalEntryContainer.innerHTML = `
+            <div class="latest-journal-card">
+                <div class="latest-journal-header">
+                    <span class="latest-journal-icon">${emotionIcons[latestEntry.emotion] || '🤔'}</span>
+                    <span class="latest-journal-emotion">${latestEntry.emotion}</span>
+                </div>
+                ${latestEntry.comment ? `<p class="latest-journal-comment">"${latestEntry.comment}"</p>` : '<p class="latest-journal-comment"><i>Sin comentarios.</i></p>'}
+                <div class="latest-journal-date">${latestEntryDate}</div>
+            </div>
+        `;
+
+        // Lógica para el gráfico
+        const ctx = document.getElementById('emotion-chart').getContext('2d');
+        
+        // Mapear emociones a valores numéricos para el gráfico
+        const emotionMap = { 'Feliz': 1, 'Neutral': 0, 'Preocupado': -1 };
+        const labels = journalEntries.map(entry => new Date(entry.date).toLocaleDateString('es-ES'));
+        const dataPoints = journalEntries.map(entry => emotionMap[entry.emotion]);
+
+        if (emotionChart) {
+            emotionChart.destroy(); // Destruir el gráfico anterior para redibujar
+        }
+
+        emotionChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [{
+                    label: 'Estado de Ánimo',
+                    data: dataPoints,
+                    borderColor: '#00f2ff',
+                    backgroundColor: 'rgba(0, 242, 255, 0.2)',
+                    tension: 0.3,
+                    fill: true,
+                    pointBackgroundColor: '#ffffff',
+                    pointBorderColor: '#00f2ff',
+                    pointHoverRadius: 7,
+                    pointHoverBackgroundColor: '#00f2ff',
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        ticks: {
+                            color: '#bdc3c7',
+                            callback: function(value) {
+                                for (let emotion in emotionMap) {
+                                    if (emotionMap[emotion] === value) return emotion;
+                                }
+                            }
+                        },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    },
+                    x: {
+                        ticks: { color: '#bdc3c7' },
+                        grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const entry = journalEntries[context.dataIndex];
+                                return `${entry.emotion}${entry.comment ? ': ' + entry.comment : ''}`;
+                            }
+                        }
+                    }
+                }
+            }
         });
     };
 
@@ -230,7 +450,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Guardar la emoción
     saveEmotionBtn.addEventListener('click', () => {
         if (!selectedEmotion) {
-            alert('Por favor, selecciona cómo te sientes.');
+            showToast('Por favor, selecciona cómo te sientes.', 'warning');
             return;
         }
         const comment = document.getElementById('emotion-comment').value;
